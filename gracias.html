@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gracias · DermaMedis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --aqua:#63C3BC;--teal:#2C8CA0;--teal-deep:#1C6C7E;--ink:#37414A;--muted:#6E7C83;
+    --bg-soft:#F2F7F7;--line:#E4EDED;--grad:linear-gradient(135deg,var(--aqua),var(--teal-deep));
+    --shadow:0 14px 40px rgba(28,108,126,.14);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);
+    background:radial-gradient(120% 80% at 50% 0%, #EAF6F5 0%, #fff 60%);
+    display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;line-height:1.6}
+  .box{max-width:560px;background:#fff;border:1px solid var(--line);border-radius:26px;padding:46px 34px;box-shadow:var(--shadow)}
+  .seal{width:74px;height:74px;margin:0 auto 20px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center}
+  .seal svg{width:38px;height:38px}
+  h1{font-family:'Montserrat',sans-serif;font-size:1.8rem;margin:0 0 .5em;color:var(--ink)}
+  p{color:var(--muted);margin:0 0 1rem}
+  .word{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.15rem;letter-spacing:.02em;margin-bottom:26px}
+  .word b{color:var(--ink)} .word span{color:var(--muted);font-weight:600} .word .bar{color:var(--aqua);margin:0 3px}
+  .detail{background:var(--bg-soft);border-radius:14px;padding:14px 18px;margin:18px 0;font-weight:600;color:var(--teal-deep)}
+  .btn{display:inline-block;font-family:'Montserrat',sans-serif;font-weight:600;padding:14px 28px;border-radius:999px;
+    background:var(--grad);color:#fff;box-shadow:var(--shadow);margin-top:10px;text-decoration:none}
+  #calendly{margin-top:24px}
+</style>
+</head>
+<body>
+  <div class="box">
+    <div class="word"><b>DERMA</b><span class="bar">|</span><span>MEDIS</span></div>
+    <div class="seal">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M20 6 9 17l-5-5"/>
+      </svg>
+    </div>
+    <h1 id="title">¡Gracias!</h1>
+    <p id="msg">Recibimos tu solicitud de cupo. Te confirmaremos tu valoración lo antes posible.</p>
+    <div class="detail" id="detail" style="display:none"></div>
+    <div id="calendly"></div>
+    <a class="btn" href="index.html" id="back">Volver al inicio</a>
+  </div>
+
+<script>
+// ====== Pega aquí el enlace de Calendly cuando exista. Vacío = solo mensaje de gracias. ======
+var CALENDLY_URL = "";
+
+var T = {
+  es:{ title:"¡Gracias!", msg:"Recibimos tu solicitud de cupo. Te confirmaremos tu valoración lo antes posible.",
+       back:"Volver al inicio", slot:"Cita elegida" },
+  en:{ title:"Thank you!", msg:"We've received your booking request. We'll confirm your assessment as soon as possible.",
+       back:"Back to home", slot:"Chosen appointment" }
+};
+
+try{
+  var params = new URLSearchParams(location.search);
+  var lang = params.get('lang'); 
+  if(!lang){ try{ lang = localStorage.getItem('dm_lang'); }catch(e){} }
+  lang = T[lang] ? lang : 'es';
+  document.documentElement.lang = lang;
+
+  var nombre = (params.get('nombre') || '').trim();
+  var correo = (params.get('correo') || '').trim();
+  var horario = (params.get('horario') || '').trim();
+  var dia = (params.get('dia') || '').trim();
+
+  var greet = T[lang].title;
+  if(nombre){ greet = (lang==='en' ? "Thank you, " : "¡Gracias, ") + nombre + (lang==='en' ? "!" : "!"); }
+  document.getElementById('title').textContent = greet;
+  document.getElementById('msg').textContent = T[lang].msg;
+  document.getElementById('back').textContent = T[lang].back;
+
+  if(dia || horario){
+    var d = document.getElementById('detail');
+    d.style.display = 'block';
+    var parts = []; if(dia) parts.push(dia); if(horario) parts.push(horario);
+    d.textContent = T[lang].slot + ': ' + parts.join(', ');
+  }
+
+  if(CALENDLY_URL){
+    var url = new URL(CALENDLY_URL);
+    if(nombre) url.searchParams.set('name', nombre);
+    if(correo) url.searchParams.set('email', correo);
+    var f = document.createElement('iframe');
+    f.src = url.href; f.width = '100%'; f.height = '640'; f.style.border = '0'; f.style.borderRadius = '14px';
+    f.title = 'Calendly';
+    document.getElementById('calendly').appendChild(f);
+  }
+}catch(e){ console.error(e); }
+</script>
+</body>
+</html>
