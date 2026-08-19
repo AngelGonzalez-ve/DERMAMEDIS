@@ -169,7 +169,7 @@ document.documentElement.classList.add('js');
 
 /* ============ CONFIG ============ */
 // Pega aquí la URL /exec de tu implementación de Apps Script.
-var FORM_ENDPOINT = "";
+var FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO2fLuqsEJ1_Bi0PrNki1_8ujtni40IfUUue67L4bfA36DjH1pNr0hsVMTzpE5L919/exec";
 
 /* ============ TEXTOS (ES/EN) ============ */
 var UI = {
@@ -189,7 +189,7 @@ var UI = {
     res_cta_p:"Agenda tu Valoración Dermatológica 360 con el Dr. Angelinho y sal con un plan claro por escrito.",
     res_cta_btn:"Agenda tu valoración",
     res_disc:"Estas recomendaciones son orientativas y no sustituyen una valoración médica.",
-    err_name:"Escribe tu nombre.", err_phone:"Escribe un teléfono válido.",
+    err_name:"Escribe tu nombre y apellido.", err_phone:"Escribe un número venezolano válido, ej: 0412 1234567.",
     sending:"Guardando tus respuestas...",
     r_intro:"Según tus respuestas, esto es en lo que conviene que te enfoques:"
   },
@@ -209,7 +209,7 @@ var UI = {
     res_cta_p:"Book your 360 Dermatological Assessment with Dr. Angelinho and leave with a clear written plan.",
     res_cta_btn:"Book your assessment",
     res_disc:"These recommendations are for guidance only and do not replace a medical assessment.",
-    err_name:"Please enter your name.", err_phone:"Please enter a valid phone.",
+    err_name:"Enter your first and last name.", err_phone:"Enter a valid Venezuelan number, e.g. 0412 1234567.",
     sending:"Saving your answers...",
     r_intro:"Based on your answers, here's what's worth focusing on:"
   }
@@ -423,13 +423,18 @@ init(function(){
 
   document.getElementById('submit-btn').addEventListener('click', function(){
     var err=document.getElementById('lead-err');
-    var nombre=document.getElementById('nombre').value.trim();
+    var nombre=document.getElementById('nombre').value.trim().replace(/\s+/g,' ');
     var telefono=document.getElementById('telefono').value.trim();
-    if(!nombre){ err.textContent=T('err_name'); return; }
-    if(telefono.replace(/[^0-9]/g,'').length<7){ err.textContent=T('err_phone'); return; }
+    var nameOk=/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'’.\-]{2,}(\s+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'’.\-]{2,})+$/.test(nombre);
+    if(!nameOk){ err.textContent=T('err_name'); return; }
+    var d=telefono.replace(/\D/g,'');
+    if(d.indexOf('58')===0 && d.length===12) d=d.slice(2);
+    else if(d.charAt(0)==='0' && d.length===11) d=d.slice(1);
+    if(!/^4(12|14|16|24|26)\d{7}$/.test(d)){ err.textContent=T('err_phone'); return; }
+    var telefonoNorm='0'+d;
     err.textContent='';
     var btn=this; btn.disabled=true; btn.textContent=T('sending');
-    var payload={ nombre:nombre, telefono:telefono, idioma:LANG };
+    var payload={ nombre:nombre, telefono:telefonoNorm, idioma:LANG };
     QUESTIONS.forEach(function(q){ payload[q.key]=answers[q.key]||''; });
     sendLead(payload);
     // El valor se entrega aquí mismo, sin depender de la respuesta del servidor.
