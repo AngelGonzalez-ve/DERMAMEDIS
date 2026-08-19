@@ -169,7 +169,7 @@ document.documentElement.classList.add('js');
 
 /* ============ CONFIG ============ */
 // Pega aquí la URL /exec de tu implementación de Apps Script.
-var FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbzO2fLuqsEJ1_Bi0PrNki1_8ujtni40IfUUue67L4bfA36DjH1pNr0hsVMTzpE5L919/exec";
+var FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbx-kFlqiJrr4NZFjz0n632Hh9-J0KYw_sqLNZdMKsdSsDJyefZTmD5JJsQtIHa-wq0n/exec";
 
 /* ============ TEXTOS (ES/EN) ============ */
 var UI = {
@@ -434,7 +434,7 @@ init(function(){
     var telefonoNorm='0'+d;
     err.textContent='';
     var btn=this; btn.disabled=true; btn.textContent=T('sending');
-    var payload={ nombre:nombre, telefono:telefonoNorm, idioma:LANG };
+    var payload={ hoja:"dermamedis", nombre:nombre, telefono:telefonoNorm, idioma:LANG };
     QUESTIONS.forEach(function(q){ payload[q.key]=answers[q.key]||''; });
     sendLead(payload);
     // El valor se entrega aquí mismo, sin depender de la respuesta del servidor.
