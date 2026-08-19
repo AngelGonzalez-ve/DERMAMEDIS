@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico de piel · DermaMedis</title>
+<meta name="description" content="Test de piel DermaMedis: responde unas preguntas y recibe recomendaciones personalizadas para el cuidado de tu piel.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ PALETA DermaMedis (teal/aqua del logo) ============ */
+  :root{
+    --aqua:#63C3BC;--teal:#2C8CA0;--teal-deep:#1C6C7E;--ink:#37414A;--muted:#6E7C83;
+    --bg:#FFFFFF;--bg-soft:#F2F7F7;--line:#E4EDED;
+    --grad:linear-gradient(135deg,var(--aqua),var(--teal-deep));
+    --shadow:0 14px 40px rgba(28,108,126,.14);--radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);
+    background:radial-gradient(130% 90% at 50% 0%, #EAF6F5 0%, #fff 55%);
+    line-height:1.6;text-align:center;min-height:100vh}
+  h1,h2,h3{font-family:'Montserrat',sans-serif;line-height:1.22;color:var(--ink);margin:0 0 .5em}
+  p{margin:0 0 1rem}
+  .wrap{max-width:640px;margin:0 auto;padding:22px}
+
+  /* ============ MARCA ============ */
+  .brand{display:inline-flex;align-items:center;gap:10px;margin:26px 0 6px}
+  .brand .mark{width:34px;height:34px}
+  .brand .word{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.24rem;letter-spacing:.02em}
+  .brand .word b{color:var(--ink)} .brand .word .bar{color:var(--aqua);margin:0 3px} .brand .word span{color:var(--muted);font-weight:600}
+
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-family:'Montserrat',sans-serif;margin-bottom:6px}
+  .lang button{border:0;background:#fff;color:var(--muted);font-weight:600;font-size:.78rem;padding:6px 12px;cursor:pointer}
+  .lang button.active{background:var(--teal);color:#fff}
+
+  /* ============ TARJETA / PROGRESO ============ */
+  .card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:32px 28px;margin-top:14px;text-align:left}
+  .progress{height:8px;background:var(--bg-soft);border-radius:999px;overflow:hidden;margin-bottom:8px}
+  .progress i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .35s ease}
+  .pcount{font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:22px;text-align:center}
+
+  .q{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.3rem;text-align:center;margin-bottom:6px}
+  .qsub{font-size:.92rem;color:var(--muted);text-align:center;margin-bottom:22px}
+
+  .opts{display:flex;flex-direction:column;gap:12px}
+  .opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);
+    border-radius:14px;padding:16px 18px;font:inherit;color:var(--ink);cursor:pointer;transition:.15s}
+  .opt:hover{border-color:var(--aqua);background:#fbfefe;transform:translateY(-1px)}
+  .opt .tick{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);transition:.15s}
+  .opt.sel{border-color:var(--teal);background:#f2fbfb}
+  .opt.sel .tick{border-color:var(--teal);background:var(--teal) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>") center/13px no-repeat}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+  .btn{font-family:'Montserrat',sans-serif;font-weight:600;font-size:1rem;padding:14px 26px;border-radius:999px;cursor:pointer;border:0;
+    background:var(--grad);color:#fff;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn-ghost{background:transparent;color:var(--muted);box-shadow:none;border:0;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;padding:10px}
+  .btn-ghost[disabled]{opacity:.3;cursor:default}
+
+  /* ============ CAPTURA ============ */
+  .field{margin-bottom:16px}
+  .field label{display:block;font-weight:600;font-size:.9rem;margin-bottom:6px}
+  .field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font:inherit;color:var(--ink);background:#fff}
+  .field input:focus{outline:0;border-color:var(--aqua)}
+  .err{color:#c0392b;font-size:.85rem;min-height:1.1em;margin:2px 0 6px}
+  .lock{display:flex;align-items:center;gap:8px;justify-content:center;font-size:.82rem;color:var(--muted);margin-top:14px}
+  .lock svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2}
+
+  /* ============ RESULTADO ============ */
+  .badge{display:inline-block;background:var(--bg-soft);color:var(--teal-deep);font-weight:600;font-size:.85rem;padding:7px 16px;border-radius:999px;margin-bottom:14px}
+  .tips{list-style:none;margin:18px 0 0;padding:0}
+  .tips li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+  .tips li:first-child{border-top:0}
+  .tips .dot{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem}
+  .cta-box{margin-top:24px;background:var(--bg-soft);border-radius:16px;padding:22px}
+  .cta-box .btn{width:100%;margin-top:12px;display:block;text-align:center;text-decoration:none}
+  .disclaimer{font-size:.78rem;color:var(--muted);margin-top:18px}
+  .spinner{width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;animation:spin .8s linear infinite;margin:10px auto}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .center{text-align:center}
+  .hidden{display:none !important}
+  .foot{font-size:.78rem;color:var(--muted);padding:20px 0 34px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="center">
+    <div class="lang" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="es" class="active">ES</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <div class="brand">
+      <svg class="mark" viewBox="0 0 40 40" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#63C3BC"/><stop offset="1" stop-color="#1C6C7E"/></linearGradient></defs>
+        <path d="M20 3c-6 5-9 11-6 18 3 6 6 8 6 13 0-5 3-7 6-13 3-7 0-13-6-18z" fill="none" stroke="url(#lg)" stroke-width="2"/>
+        <path d="M20 14c-5-1-9 2-11 7 5 1 9-1 11-7z" fill="url(#lg)"/>
+      </svg>
+      <span class="word"><b>DERMA</b><span class="bar">|</span><span>MEDIS</span></span>
+    </div>
+  </div>
+
+  <!-- ====== INTRO ====== -->
+  <div class="card" id="screen-intro">
+    <h1 class="center" data-k="intro_h1">Descubre qué necesita tu piel</h1>
+    <p class="center" data-k="intro_p">Responde 8 preguntas rápidas (menos de 1 minuto) y recibe recomendaciones personalizadas para el cuidado de tu piel.</p>
+    <div class="center"><button class="btn" id="start-btn" data-k="intro_btn">Empezar el test</button></div>
+  </div>
+
+  <!-- ====== PREGUNTAS ====== -->
+  <div class="card hidden" id="screen-quiz">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="pcount"><span id="pnow">1</span> / <span id="ptot">8</span></div>
+    <div class="q" id="q-text">—</div>
+    <div class="qsub" id="q-sub"></div>
+    <div class="opts" id="opts"></div>
+    <div class="nav">
+      <button class="btn-ghost" id="back-btn" data-k="nav_back">Atrás</button>
+      <button class="btn" id="next-btn" disabled data-k="nav_next">Siguiente</button>
+    </div>
+  </div>
+
+  <!-- ====== CAPTURA ====== -->
+  <div class="card hidden" id="screen-lead">
+    <h2 class="center" data-k="lead_h2">Tu diagnóstico está listo</h2>
+    <p class="center" data-k="lead_p">Déjanos tus datos y te mostramos tus recomendaciones personalizadas al instante.</p>
+    <div class="field">
+      <label for="nombre" data-k="f_name">Nombre</label>
+      <input id="nombre" type="text" autocomplete="name" data-kph="ph_name" placeholder="Tu nombre">
+    </div>
+    <div class="field">
+      <label for="telefono" data-k="f_phone">Teléfono (WhatsApp)</label>
+      <input id="telefono" type="tel" autocomplete="tel" data-kph="ph_phone" placeholder="Ej: 0412 000 0000">
+    </div>
+    <p class="err" id="lead-err"></p>
+    <button class="btn" id="submit-btn" style="width:100%" data-k="lead_btn">Ver mis recomendaciones</button>
+    <div class="lock">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <span data-k="lead_lock">Tus datos son privados y solo los usa DermaMedis para contactarte.</span>
+    </div>
+  </div>
+
+  <!-- ====== RESULTADO ====== -->
+  <div class="card hidden" id="screen-result">
+    <div class="center">
+      <div class="badge" id="r-badge">—</div>
+      <h2 id="r-title" data-k="res_title">Tus recomendaciones</h2>
+      <p id="r-intro" class="muted"></p>
+    </div>
+    <ul class="tips" id="r-tips"></ul>
+    <div class="cta-box center">
+      <strong data-k="res_cta_t">¿Quieres un diagnóstico profesional de verdad?</strong>
+      <p style="margin:6px 0 0;font-size:.92rem;color:var(--muted)" data-k="res_cta_p">Agenda tu Valoración Dermatológica 360 con el Dr. Angelinho y sal con un plan claro por escrito.</p>
+      <!-- Enlace a la landing. Ajusta el destino si tu página se llama distinto. -->
+      <a class="btn" id="cta-book" href="index.html" data-k="res_cta_btn">Agenda tu valoración</a>
+    </div>
+    <p class="disclaimer center" data-k="res_disc">Estas recomendaciones son orientativas y no sustituyen una valoración médica.</p>
+  </div>
+
+  <div class="foot">© <span id="year"></span> DermaMedis</div>
+</div>
+
+<script>
+document.documentElement.classList.add('js');
+
+/* ============ CONFIG ============ */
+// Pega aquí la URL /exec de tu implementación de Apps Script.
+var FORM_ENDPOINT = "";
+
+/* ============ TEXTOS (ES/EN) ============ */
+var UI = {
+  es:{
+    intro_h1:"Descubre qué necesita tu piel",
+    intro_p:"Responde 8 preguntas rápidas (menos de 1 minuto) y recibe recomendaciones personalizadas para el cuidado de tu piel.",
+    intro_btn:"Empezar el test",
+    nav_back:"Atrás", nav_next:"Siguiente",
+    lead_h2:"Tu diagnóstico está listo",
+    lead_p:"Déjanos tus datos y te mostramos tus recomendaciones personalizadas al instante.",
+    f_name:"Nombre", f_phone:"Teléfono (WhatsApp)",
+    ph_name:"Tu nombre", ph_phone:"Ej: 0412 000 0000",
+    lead_btn:"Ver mis recomendaciones",
+    lead_lock:"Tus datos son privados y solo los usa DermaMedis para contactarte.",
+    res_title:"Tus recomendaciones",
+    res_cta_t:"¿Quieres un diagnóstico profesional de verdad?",
+    res_cta_p:"Agenda tu Valoración Dermatológica 360 con el Dr. Angelinho y sal con un plan claro por escrito.",
+    res_cta_btn:"Agenda tu valoración",
+    res_disc:"Estas recomendaciones son orientativas y no sustituyen una valoración médica.",
+    err_name:"Escribe tu nombre.", err_phone:"Escribe un teléfono válido.",
+    sending:"Guardando tus respuestas...",
+    r_intro:"Según tus respuestas, esto es en lo que conviene que te enfoques:"
+  },
+  en:{
+    intro_h1:"Find out what your skin needs",
+    intro_p:"Answer 8 quick questions (under 1 minute) and get personalized skin-care recommendations.",
+    intro_btn:"Start the test",
+    nav_back:"Back", nav_next:"Next",
+    lead_h2:"Your diagnosis is ready",
+    lead_p:"Leave your details and we'll show your personalized recommendations right away.",
+    f_name:"Name", f_phone:"Phone (WhatsApp)",
+    ph_name:"Your name", ph_phone:"e.g. +58 412 000 0000",
+    lead_btn:"See my recommendations",
+    lead_lock:"Your data is private and only used by DermaMedis to contact you.",
+    res_title:"Your recommendations",
+    res_cta_t:"Want a real professional diagnosis?",
+    res_cta_p:"Book your 360 Dermatological Assessment with Dr. Angelinho and leave with a clear written plan.",
+    res_cta_btn:"Book your assessment",
+    res_disc:"These recommendations are for guidance only and do not replace a medical assessment.",
+    err_name:"Please enter your name.", err_phone:"Please enter a valid phone.",
+    sending:"Saving your answers...",
+    r_intro:"Based on your answers, here's what's worth focusing on:"
+  }
+};
+
+/* ============ PREGUNTAS ============
+   key: campo que se envía al Sheet. options: {v: valor guardado, es, en} */
+var QUESTIONS = [
+  { key:"tipo_piel",
+    es:"¿Cómo sientes tu piel a media mañana?", en:"How does your skin feel by mid-morning?",
+    opts:[
+      {v:"grasa", es:"Grasa o con brillo", en:"Oily or shiny"},
+      {v:"seca", es:"Tirante o reseca", en:"Tight or dry"},
+      {v:"mixta", es:"Mixta (zona T grasa)", en:"Combination (oily T-zone)"},
+      {v:"normal", es:"Normal, equilibrada", en:"Normal, balanced"}
+    ]},
+  { key:"preocupacion",
+    es:"¿Cuál es tu principal preocupación hoy?", en:"What's your main concern today?",
+    opts:[
+      {v:"acne", es:"Acné o granos", en:"Acne or breakouts"},
+      {v:"manchas", es:"Manchas o tono desigual", en:"Dark spots or uneven tone"},
+      {v:"arrugas", es:"Arrugas o flacidez", en:"Wrinkles or sagging"},
+      {v:"sensibilidad", es:"Rojeces o sensibilidad", en:"Redness or sensitivity"},
+      {v:"lunar", es:"Revisar un lunar", en:"Check a mole"}
+    ]},
+  { key:"sol",
+    es:"¿Cuánto sol recibes sin protección?", en:"How much sun do you get without protection?",
+    opts:[
+      {v:"mucho", es:"Casi siempre", en:"Almost always"},
+      {v:"medio", es:"A veces", en:"Sometimes"},
+      {v:"poco", es:"Casi nunca", en:"Almost never"}
+    ]},
+  { key:"rutina",
+    es:"¿Qué haces hoy por tu piel?", en:"What do you do for your skin today?",
+    opts:[
+      {v:"nada", es:"Nada", en:"Nothing"},
+      {v:"basico", es:"Solo agua y jabón", en:"Just water and soap"},
+      {v:"rutina_basica", es:"Una rutina básica", en:"A basic routine"},
+      {v:"rutina_completa", es:"Una rutina completa", en:"A full routine"}
+    ]},
+  { key:"intentos",
+    es:"¿Has probado cremas o tratamientos que no te funcionaron?", en:"Have you tried creams or treatments that didn't work?",
+    opts:[
+      {v:"varios", es:"Sí, varios", en:"Yes, several"},
+      {v:"alguno", es:"Alguno", en:"One or two"},
+      {v:"no", es:"No", en:"No"}
+    ]},
+  { key:"presupuesto",
+    es:"Para ajustar las recomendaciones a tu bolsillo, ¿cuánto inviertes al mes en tu piel?",
+    en:"To fit the recommendations to your budget, how much do you spend on your skin each month?",
+    opts:[
+      {v:"0", es:"Nada aún", en:"Nothing yet"},
+      {v:"<10", es:"Menos de $10", en:"Under $10"},
+      {v:"10-30", es:"$10 a $30", en:"$10 to $30"},
+      {v:"30-60", es:"$30 a $60", en:"$30 to $60"},
+      {v:">60", es:"Más de $60", en:"Over $60"}
+    ]},
+  { key:"revision",
+    es:"¿Hace cuánto no te revisa un dermatólogo?", en:"How long since a dermatologist last checked you?",
+    opts:[
+      {v:"nunca", es:"Nunca", en:"Never"},
+      {v:"+1anio", es:"Hace más de un año", en:"More than a year ago"},
+      {v:"este_anio", es:"Este año", en:"This year"}
+    ]},
+  { key:"edad",
+    es:"¿En qué rango de edad estás? (opcional)", en:"What's your age range? (optional)",
+    opts:[
+      {v:"-20", es:"Menos de 20", en:"Under 20"},
+      {v:"20-30", es:"20 a 30", en:"20 to 30"},
+      {v:"30-45", es:"30 a 45", en:"30 to 45"},
+      {v:"45+", es:"45 o más", en:"45 or more"}
+    ]}
+];
+
+/* ============ RECOMENDACIONES (por tipo de piel + preocupación) ============ */
+var TIPS = {
+  base:{
+    grasa:{ es:"Limpia dos veces al día con un gel suave sin resecar; el exceso de lavado dispara más grasa.",
+            en:"Cleanse twice a day with a gentle gel without over-drying; over-washing triggers more oil." },
+    seca:{ es:"Usa un limpiador cremoso y una crema hidratante mañana y noche para reparar la barrera de tu piel.",
+           en:"Use a creamy cleanser and moisturize morning and night to repair your skin barrier." },
+    mixta:{ es:"Trata por zonas: control de grasa en la zona T e hidratación en mejillas.",
+            en:"Treat by zone: oil control on the T-zone and hydration on the cheeks." },
+    normal:{ es:"Mantén una rutina simple y constante: limpieza, hidratación y protección solar.",
+             en:"Keep a simple, consistent routine: cleanse, moisturize and sunscreen." }
+  },
+  concern:{
+    acne:{ es:"Evita reventar los granos y busca ingredientes como niacinamida o ácido salicílico, sin abusar.",
+           en:"Avoid popping pimples and look for ingredients like niacinamide or salicylic acid, without overdoing it." },
+    manchas:{ es:"El protector solar diario es tu mejor aliado contra las manchas; sin él, cualquier tratamiento se revierte.",
+              en:"Daily sunscreen is your best ally against dark spots; without it, any treatment reverses." },
+    arrugas:{ es:"Hidratación constante y protección solar frenan el envejecimiento más que cualquier crema cara.",
+              en:"Consistent hydration and sun protection slow aging more than any expensive cream." },
+    sensibilidad:{ es:"Simplifica: menos productos, sin fragancia y prueba cada uno por separado para hallar el que te irrita.",
+                   en:"Simplify: fewer products, fragrance-free, and test each one separately to find the irritant." },
+    lunar:{ es:"Un lunar que cambia de forma, color o tamaño merece revisión profesional cuanto antes.",
+            en:"A mole that changes shape, color or size deserves a professional check as soon as possible." }
+  },
+  sun:{ es:"Aplica protector solar todos los días, incluso nublado o en interiores con ventanas.",
+        en:"Apply sunscreen every day, even when cloudy or indoors near windows." },
+  routine_nada:{ es:"Empieza por lo esencial: un limpiador, una crema hidratante y un protector solar. Con eso ya avanzas muchísimo.",
+                 en:"Start with the essentials: a cleanser, a moisturizer and a sunscreen. That alone takes you far." }
+};
+
+/* ============ ESTADO ============ */
+var LANG = 'es';
+var answers = {};   // key -> value
+var idx = 0;
+
+function T(k){ return (UI[LANG] && UI[LANG][k]) || UI.es[k] || ''; }
+
+function applyLang(lang){
+  LANG = UI[lang] ? lang : 'es';
+  document.documentElement.lang = LANG;
+  try{ localStorage.setItem('dm_lang', LANG); }catch(e){}
+  document.querySelectorAll('[data-k]').forEach(function(el){ var v=T(el.getAttribute('data-k')); if(v) el.textContent=v; });
+  document.querySelectorAll('[data-kph]').forEach(function(el){ var v=T(el.getAttribute('data-kph').replace('ph_','')); });
+  var pn=document.getElementById('nombre'), pt=document.getElementById('telefono');
+  if(pn) pn.placeholder=T('ph_name'); if(pt) pt.placeholder=T('ph_phone');
+  document.querySelectorAll('.lang button').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-lang')===LANG); });
+  if(!document.getElementById('screen-quiz').classList.contains('hidden')) renderQuestion();
+}
+
+function show(id){
+  ['screen-intro','screen-quiz','screen-lead','screen-result'].forEach(function(s){
+    document.getElementById(s).classList.toggle('hidden', s!==id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQuestion(){
+  var q = QUESTIONS[idx];
+  document.getElementById('ptot').textContent = QUESTIONS.length;
+  document.getElementById('pnow').textContent = idx+1;
+  document.getElementById('bar').style.width = ((idx)/QUESTIONS.length*100) + '%';
+  document.getElementById('q-text').textContent = q[LANG];
+  var opts = document.getElementById('opts'); opts.innerHTML='';
+  q.opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='opt'+(answers[q.key]===o.v?' sel':'');
+    b.innerHTML='<span class="tick"></span><span>'+o[LANG]+'</span>';
+    b.addEventListener('click', function(){
+      answers[q.key]=o.v;
+      opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');
+      document.getElementById('next-btn').disabled=false;
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById('next-btn').disabled = !answers[q.key];
+  document.getElementById('back-btn').disabled = (idx===0);
+  document.getElementById('next-btn').textContent = (idx===QUESTIONS.length-1) ? (LANG==='en'?'Finish':'Finalizar') : T('nav_next');
+}
+
+function buildTips(){
+  var t=[], st=answers.tipo_piel, cn=answers.preocupacion;
+  if(TIPS.base[st]) t.push(TIPS.base[st][LANG]);
+  if(TIPS.concern[cn]) t.push(TIPS.concern[cn][LANG]);
+  if(answers.sol==='mucho' || answers.sol==='medio') t.push(TIPS.sun[LANG]);
+  if(answers.rutina==='nada') t.push(TIPS.routine_nada[LANG]);
+  // asegura al menos 3 consejos
+  if(t.length<3) t.push(TIPS.sun[LANG]);
+  return t.filter(function(v,i,a){return a.indexOf(v)===i;}).slice(0,4);
+}
+
+function skinLabel(){
+  var map={grasa:{es:"Piel grasa",en:"Oily skin"},seca:{es:"Piel seca",en:"Dry skin"},
+    mixta:{es:"Piel mixta",en:"Combination skin"},normal:{es:"Piel normal",en:"Normal skin"}};
+  var m=map[answers.tipo_piel]; return m?m[LANG]:'';
+}
+
+function renderResult(nombre){
+  document.getElementById('r-badge').textContent = skinLabel();
+  document.getElementById('r-intro').textContent = (nombre? (nombre+', ') : '') + T('r_intro');
+  var ul=document.getElementById('r-tips'); ul.innerHTML='';
+  buildTips().forEach(function(tip,i){
+    var li=document.createElement('li');
+    li.innerHTML='<span class="dot">'+(i+1)+'</span><span>'+tip+'</span>';
+    ul.appendChild(li);
+  });
+  show('screen-result');
+}
+
+function sendLead(payload){
+  // text/plain evita el preflight de CORS con Apps Script; es fire-and-forget.
+  try{
+    if(FORM_ENDPOINT){
+      fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload) })
+        .catch(function(e){ console.error(e); });
+    }
+  }catch(e){ console.error(e); }
+}
+
+/* ============ INIT ============ */
+function init(fn){ try{ fn(); }catch(e){ console.error(e); } }
+
+init(function(){
+  var saved='es'; try{ saved=localStorage.getItem('dm_lang')||'es'; }catch(e){}
+  applyLang(saved);
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.addEventListener('click', function(){ applyLang(b.getAttribute('data-lang')); });
+  });
+
+  document.getElementById('start-btn').addEventListener('click', function(){ idx=0; show('screen-quiz'); renderQuestion(); });
+  document.getElementById('back-btn').addEventListener('click', function(){ if(idx>0){ idx--; renderQuestion(); } });
+  document.getElementById('next-btn').addEventListener('click', function(){
+    if(!answers[QUESTIONS[idx].key]) return;
+    if(idx<QUESTIONS.length-1){ idx++; renderQuestion(); }
+    else { document.getElementById('bar').style.width='100%'; show('screen-lead'); }
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', function(){
+    var err=document.getElementById('lead-err');
+    var nombre=document.getElementById('nombre').value.trim();
+    var telefono=document.getElementById('telefono').value.trim();
+    if(!nombre){ err.textContent=T('err_name'); return; }
+    if(telefono.replace(/[^0-9]/g,'').length<7){ err.textContent=T('err_phone'); return; }
+    err.textContent='';
+    var btn=this; btn.disabled=true; btn.textContent=T('sending');
+    var payload={ nombre:nombre, telefono:telefono, idioma:LANG };
+    QUESTIONS.forEach(function(q){ payload[q.key]=answers[q.key]||''; });
+    sendLead(payload);
+    // El valor se entrega aquí mismo, sin depender de la respuesta del servidor.
+    setTimeout(function(){ renderResult(nombre); }, 600);
+  });
+
+  var y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
+});
+</script>
+</body>
+</html>
