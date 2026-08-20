@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico de tu lesión · OrthoVital</title>
+<meta name="description" content="Test de OrthoVital: responde unas preguntas sobre tu lesión y recibe orientación personalizada para tu recuperación.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ PALETA OrthoVital (azul marino + azul + verde del logo) ============ */
+  :root{
+    --navy:#163A5A;--blue:#3E8FC4;--blue-light:#5BA8D6;--green:#74BE3C;--ink:#22303C;--muted:#5E7284;
+    --bg:#FFFFFF;--bg-soft:#F1F6FA;--line:#E1EAF1;
+    --grad:linear-gradient(135deg,var(--blue-light),var(--navy));
+    --shadow:0 14px 40px rgba(22,58,90,.14);--radius:18px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:'Inter',system-ui,-apple-system,sans-serif;color:var(--ink);
+    background:radial-gradient(130% 90% at 50% 0%, #E7F1F9 0%, #fff 55%);
+    line-height:1.6;text-align:center;min-height:100vh}
+  h1,h2,h3{font-family:'Montserrat',sans-serif;line-height:1.22;color:var(--ink);margin:0 0 .5em}
+  p{margin:0 0 1rem}
+  .wrap{max-width:640px;margin:0 auto;padding:22px}
+
+  .brand{display:inline-flex;align-items:center;gap:10px;margin:26px 0 6px}
+  .brand .word{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.3rem;letter-spacing:.02em}
+  .brand .word b{color:var(--navy)} .brand .word span{color:var(--blue)}
+  .brand .sub{display:block;font-size:.62rem;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin-top:2px;font-weight:600}
+
+  .lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;font-family:'Montserrat',sans-serif;margin-bottom:6px}
+  .lang button{border:0;background:#fff;color:var(--muted);font-weight:600;font-size:.78rem;padding:6px 12px;cursor:pointer}
+  .lang button.active{background:var(--blue);color:#fff}
+
+  .card{background:#fff;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);padding:32px 28px;margin-top:14px;text-align:left}
+  .progress{height:8px;background:var(--bg-soft);border-radius:999px;overflow:hidden;margin-bottom:8px}
+  .progress i{display:block;height:100%;width:0;background:var(--grad);border-radius:999px;transition:width .35s ease}
+  .pcount{font-size:.8rem;color:var(--muted);font-weight:600;margin-bottom:22px;text-align:center}
+
+  .q{font-family:'Montserrat',sans-serif;font-weight:700;font-size:1.3rem;text-align:center;margin-bottom:6px}
+  .opts{display:flex;flex-direction:column;gap:12px}
+  .opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;background:#fff;border:1.5px solid var(--line);
+    border-radius:14px;padding:16px 18px;font:inherit;color:var(--ink);cursor:pointer;transition:.15s}
+  .opt:hover{border-color:var(--blue-light);background:#fbfdff;transform:translateY(-1px)}
+  .opt .tick{flex:0 0 auto;width:22px;height:22px;border-radius:50%;border:2px solid var(--line);transition:.15s}
+  .opt.sel{border-color:var(--blue);background:#f1f8fd}
+  .opt.sel .tick{border-color:var(--blue);background:var(--blue) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>") center/13px no-repeat}
+
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:24px;gap:12px}
+  .btn{font-family:'Montserrat',sans-serif;font-weight:600;font-size:1rem;padding:14px 26px;border-radius:999px;cursor:pointer;border:0;
+    background:var(--grad);color:#fff;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
+  .btn:hover{transform:translateY(-2px)}
+  .btn[disabled]{opacity:.45;cursor:not-allowed;box-shadow:none;transform:none}
+  .btn-ghost{background:transparent;color:var(--muted);box-shadow:none;border:0;font-weight:600;cursor:pointer;font-family:'Montserrat',sans-serif;padding:10px}
+  .btn-ghost[disabled]{opacity:.3;cursor:default}
+
+  .field{margin-bottom:16px}
+  .field label{display:block;font-weight:600;font-size:.9rem;margin-bottom:6px}
+  .field input{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px 15px;font:inherit;color:var(--ink);background:#fff}
+  .field input:focus{outline:0;border-color:var(--blue-light)}
+  .err{color:#c0392b;font-size:.85rem;min-height:1.1em;margin:2px 0 6px}
+  .lock{display:flex;align-items:center;gap:8px;justify-content:center;font-size:.82rem;color:var(--muted);margin-top:14px}
+  .lock svg{width:14px;height:14px;stroke:var(--muted);fill:none;stroke-width:2}
+
+  .badge{display:inline-block;background:var(--bg-soft);color:var(--navy);font-weight:600;font-size:.85rem;padding:7px 16px;border-radius:999px;margin-bottom:14px}
+  .tips{list-style:none;margin:18px 0 0;padding:0}
+  .tips li{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+  .tips li:first-child{border-top:0}
+  .tips .dot{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:var(--grad);color:#fff;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif;font-weight:700;font-size:.8rem}
+  .cta-box{margin-top:24px;background:var(--bg-soft);border-radius:16px;padding:22px}
+  .cta-box .btn{width:100%;margin-top:12px;display:block;text-align:center;text-decoration:none}
+  .disclaimer{font-size:.78rem;color:var(--muted);margin-top:18px}
+
+  .center{text-align:center}
+  .hidden{display:none !important}
+  .foot{font-size:.78rem;color:var(--muted);padding:20px 0 34px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="center">
+    <div class="lang" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="es" class="active">ES</button>
+      <button type="button" data-lang="en">EN</button>
+    </div>
+    <div class="brand">
+      <span class="word"><b>Ortho</b><span>Vital</span>
+        <span class="sub" data-k="brand_sub">Clínica de Traumatología</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- ====== INTRO ====== -->
+  <div class="card" id="screen-intro">
+    <h1 class="center" data-k="intro_h1">Descubre qué le pasa a tu lesión</h1>
+    <p class="center" data-k="intro_p">Responde 8 preguntas rápidas (menos de 1 minuto) y recibe orientación personalizada para tu recuperación.</p>
+    <div class="center"><button class="btn" id="start-btn" data-k="intro_btn">Empezar el test</button></div>
+  </div>
+
+  <!-- ====== PREGUNTAS ====== -->
+  <div class="card hidden" id="screen-quiz">
+    <div class="progress"><i id="bar"></i></div>
+    <div class="pcount"><span id="pnow">1</span> / <span id="ptot">8</span></div>
+    <div class="q" id="q-text">—</div>
+    <div class="opts" id="opts"></div>
+    <div class="nav">
+      <button class="btn-ghost" id="back-btn" data-k="nav_back">Atrás</button>
+      <button class="btn" id="next-btn" disabled data-k="nav_next">Siguiente</button>
+    </div>
+  </div>
+
+  <!-- ====== CAPTURA ====== -->
+  <div class="card hidden" id="screen-lead">
+    <h2 class="center" data-k="lead_h2">Tu resultado está listo</h2>
+    <p class="center" data-k="lead_p">Déjanos tus datos y te mostramos tu orientación personalizada al instante.</p>
+    <div class="field">
+      <label for="nombre" data-k="f_name">Nombre y apellido</label>
+      <input id="nombre" type="text" autocomplete="name" data-kph="ph_name" placeholder="Tu nombre y apellido">
+    </div>
+    <div class="field">
+      <label for="telefono" data-k="f_phone">Teléfono (WhatsApp)</label>
+      <input id="telefono" type="tel" autocomplete="tel" data-kph="ph_phone" placeholder="Ej: 0412 000 0000">
+    </div>
+    <p class="err" id="lead-err"></p>
+    <button class="btn" id="submit-btn" style="width:100%" data-k="lead_btn">Ver mi orientación</button>
+    <div class="lock">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+      <span data-k="lead_lock">Tus datos son privados y solo los usa OrthoVital para contactarte.</span>
+    </div>
+  </div>
+
+  <!-- ====== RESULTADO ====== -->
+  <div class="card hidden" id="screen-result">
+    <div class="center">
+      <div class="badge" id="r-badge">—</div>
+      <h2 id="r-title" data-k="res_title">Tu orientación</h2>
+      <p id="r-intro" class="muted"></p>
+    </div>
+    <ul class="tips" id="r-tips"></ul>
+    <div class="cta-box center">
+      <strong data-k="res_cta_t">¿Quieres saber con certeza qué tiene tu lesión?</strong>
+      <p style="margin:6px 0 0;font-size:.92rem;color:var(--muted)" data-k="res_cta_p">Agenda tu Valoración Traumatológica 360 con la Dra. Usi y sal con un diagnóstico claro y un plan por escrito.</p>
+      <!-- Enlace a la landing. Ajusta el destino si tu página se llama distinto. -->
+      <a class="btn" id="cta-book" href="index.html" data-k="res_cta_btn">Agenda tu valoración</a>
+    </div>
+    <p class="disclaimer center" data-k="res_disc">Esta orientación es informativa y no sustituye una valoración médica.</p>
+  </div>
+
+  <div class="foot">© <span id="year"></span> OrthoVital</div>
+</div>
+
+<script>
+document.documentElement.classList.add('js');
+
+/* ============ CONFIG ============ */
+// Pega aquí la URL /exec de tu implementación de Apps Script (proyecto nuevo de OrthoVital).
+var FORM_ENDPOINT = "https://script.google.com/macros/s/AKfycbxWFpk3HUTpMUC8YP_5D6iPFuqYmqmxnmDCr5RiFcxTIFrf_qPlnaBfXqYgrWFpkifptw/exec";
+
+/* ============ TEXTOS (ES/EN) ============ */
+var UI = {
+  es:{
+    brand_sub:"Clínica de Traumatología",
+    intro_h1:"Descubre qué le pasa a tu lesión",
+    intro_p:"Responde 8 preguntas rápidas (menos de 1 minuto) y recibe orientación personalizada para tu recuperación.",
+    intro_btn:"Empezar el test",
+    nav_back:"Atrás", nav_next:"Siguiente",
+    lead_h2:"Tu resultado está listo",
+    lead_p:"Déjanos tus datos y te mostramos tu orientación personalizada al instante.",
+    f_name:"Nombre y apellido", f_phone:"Teléfono (WhatsApp)",
+    ph_name:"Tu nombre y apellido", ph_phone:"Ej: 0412 000 0000",
+    lead_btn:"Ver mi orientación",
+    lead_lock:"Tus datos son privados y solo los usa OrthoVital para contactarte.",
+    res_title:"Tu orientación",
+    res_cta_t:"¿Quieres saber con certeza qué tiene tu lesión?",
+    res_cta_p:"Agenda tu Valoración Traumatológica 360 con la Dra. Usi y sal con un diagnóstico claro y un plan por escrito.",
+    res_cta_btn:"Agenda tu valoración",
+    res_disc:"Esta orientación es informativa y no sustituye una valoración médica.",
+    err_name:"Escribe tu nombre y apellido.", err_phone:"Escribe un número venezolano válido, ej: 0412 1234567.",
+    sending:"Guardando tus respuestas...",
+    r_intro:"Según tus respuestas, esto es lo que conviene tener en cuenta:"
+  },
+  en:{
+    brand_sub:"Orthopedics & Traumatology Clinic",
+    intro_h1:"Find out what's going on with your injury",
+    intro_p:"Answer 8 quick questions (under 1 minute) and get personalized guidance for your recovery.",
+    intro_btn:"Start the test",
+    nav_back:"Back", nav_next:"Next",
+    lead_h2:"Your result is ready",
+    lead_p:"Leave your details and we'll show your personalized guidance right away.",
+    f_name:"First and last name", f_phone:"Phone (WhatsApp)",
+    ph_name:"Your first and last name", ph_phone:"e.g. +58 412 000 0000",
+    lead_btn:"See my guidance",
+    lead_lock:"Your data is private and only used by OrthoVital to contact you.",
+    res_title:"Your guidance",
+    res_cta_t:"Want to know for sure what's wrong with your injury?",
+    res_cta_p:"Book your 360 Orthopedic Assessment with Dr. Usi and leave with a clear diagnosis and a written plan.",
+    res_cta_btn:"Book your assessment",
+    res_disc:"This guidance is informational and does not replace a medical assessment.",
+    err_name:"Enter your first and last name.", err_phone:"Enter a valid Venezuelan number, e.g. 0412 1234567.",
+    sending:"Saving your answers...",
+    r_intro:"Based on your answers, here's what's worth keeping in mind:"
+  }
+};
+
+/* ============ PREGUNTAS ============ */
+var QUESTIONS = [
+  { key:"zona",
+    es:"¿Dónde tienes la molestia principal?", en:"Where is your main discomfort?",
+    opts:[
+      {v:"rodilla", es:"Rodilla", en:"Knee"},
+      {v:"hombro", es:"Hombro", en:"Shoulder"},
+      {v:"columna", es:"Columna o espalda", en:"Spine or back"},
+      {v:"cadera", es:"Cadera", en:"Hip"},
+      {v:"tobillo", es:"Tobillo o pie", en:"Ankle or foot"},
+      {v:"otra", es:"Otra zona", en:"Another area"}
+    ]},
+  { key:"tiempo",
+    es:"¿Hace cuánto empezó?", en:"How long ago did it start?",
+    opts:[
+      {v:"dias", es:"Hace pocos días", en:"A few days ago"},
+      {v:"semanas", es:"Semanas", en:"Weeks"},
+      {v:"meses", es:"Meses", en:"Months"},
+      {v:"mas_de_1_anio", es:"Más de un año", en:"More than a year"}
+    ]},
+  { key:"origen",
+    es:"¿Cómo apareció?", en:"How did it appear?",
+    opts:[
+      {v:"golpe", es:"Por un golpe o caída", en:"From a blow or fall"},
+      {v:"deporte", es:"Haciendo deporte", en:"Playing sports"},
+      {v:"gradual", es:"Poco a poco, sin causa clara", en:"Gradually, no clear cause"},
+      {v:"esfuerzo", es:"Después de un esfuerzo", en:"After an exertion"}
+    ]},
+  { key:"limitacion",
+    es:"¿Cuánto te limita hoy?", en:"How much does it limit you today?",
+    opts:[
+      {v:"leve", es:"Puedo hacer casi todo", en:"I can do almost everything"},
+      {v:"moderada", es:"Me cuesta algunas actividades", en:"Some activities are hard"},
+      {v:"alta", es:"Me limita bastante", en:"It limits me quite a lot"},
+      {v:"severa", es:"Casi no puedo moverme", en:"I can barely move"}
+    ]},
+  { key:"cirugia",
+    es:"¿Te han dicho que necesitas cirugía?", en:"Have you been told you need surgery?",
+    opts:[
+      {v:"si", es:"Sí", en:"Yes"},
+      {v:"insinuado", es:"Me lo insinuaron", en:"It was implied"},
+      {v:"no", es:"No", en:"No"},
+      {v:"sin_ir", es:"Aún no he ido a nadie", en:"I haven't seen anyone yet"}
+    ]},
+  { key:"estudios",
+    es:"¿Tienes estudios recientes (radiografías, resonancias)?", en:"Do you have recent studies (X-rays, MRIs)?",
+    opts:[
+      {v:"recientes", es:"Sí, recientes", en:"Yes, recent"},
+      {v:"viejos", es:"Sí, pero viejos", en:"Yes, but old"},
+      {v:"no", es:"No tengo", en:"I don't have any"}
+    ]},
+  { key:"presupuesto",
+    es:"Para orientarte según tus posibilidades, ¿cómo prefieres empezar?",
+    en:"To guide you within your means, how would you prefer to start?",
+    opts:[
+      {v:"economico", es:"Lo más económico posible", en:"As affordable as possible"},
+      {v:"equilibrio", es:"Equilibrio entre precio y resultado", en:"Balance of price and result"},
+      {v:"premium", es:"Lo mejor, sin importar el costo", en:"The best, regardless of cost"}
+    ]},
+  { key:"edad",
+    es:"¿En qué rango de edad estás? (opcional)", en:"What's your age range? (optional)",
+    opts:[
+      {v:"menor_20", es:"Menos de 20", en:"Under 20"},
+      {v:"20-35", es:"20 a 35", en:"20 to 35"},
+      {v:"35-50", es:"35 a 50", en:"35 to 50"},
+      {v:"50+", es:"50 o más", en:"50 or more"}
+    ]}
+];
+
+/* ============ ORIENTACIÓN (por zona + origen) ============ */
+var TIPS = {
+  zona:{
+    rodilla:{ es:"Evita cargar peso y las cuclillas profundas mientras haya dolor; el hielo unos minutos ayuda a bajar la inflamación.",
+              en:"Avoid loading weight and deep squats while it hurts; a few minutes of ice helps reduce swelling." },
+    hombro:{ es:"No fuerces levantar el brazo por encima de la cabeza; los movimientos bruscos pueden empeorar la lesión.",
+             en:"Don't force lifting your arm overhead; sudden movements can worsen the injury." },
+    columna:{ es:"Cuida tu postura y evita cargar peso doblando la espalda; el reposo total prolongado suele empeorar el dolor de espalda.",
+              en:"Mind your posture and avoid lifting by bending your back; prolonged total rest usually worsens back pain." },
+    cadera:{ es:"Evita estar mucho tiempo en la misma posición y los impactos; camina distancias cortas si no aumenta el dolor.",
+             en:"Avoid staying in one position too long and high impact; walk short distances if it doesn't increase pain." },
+    tobillo:{ es:"Mantén el pie en alto cuando puedas y evita apoyar con dolor; una férula o vendaje da estabilidad temporal.",
+              en:"Keep the foot elevated when you can and avoid weight-bearing with pain; a brace or wrap gives temporary stability." },
+    otra:{ es:"Evita los movimientos que reproducen el dolor y no fuerces la zona mientras no tengas un diagnóstico.",
+           en:"Avoid movements that reproduce the pain and don't force the area until you have a diagnosis." }
+  },
+  origen:{
+    golpe:{ es:"Tras un golpe o caída, si hay mucha inflamación, deformidad o no puedes apoyar, conviene descartar fractura pronto.",
+            en:"After a blow or fall, if there's a lot of swelling, deformity or you can't bear weight, rule out a fracture soon." },
+    deporte:{ es:"En lesiones de deporte, retomar la actividad antes de tiempo es la causa más común de recaída.",
+              en:"In sports injuries, returning to activity too soon is the most common cause of relapse." },
+    gradual:{ es:"Un dolor que aparece poco a poco suele ser por sobrecarga o desgaste; identificar la causa evita que se cronifique.",
+              en:"Pain that appears gradually is often from overload or wear; finding the cause prevents it from becoming chronic." },
+    esfuerzo:{ es:"Si empezó tras un esfuerzo, evita repetir ese gesto hasta que un especialista valore la zona.",
+               en:"If it started after an exertion, avoid repeating that motion until a specialist evaluates the area." }
+  },
+  alarma:{ es:"Señales para no dejar pasar: dolor intenso que no cede, hormigueo, pérdida de fuerza o no poder apoyar. En esos casos, acude pronto.",
+           en:"Warning signs not to ignore: intense unrelenting pain, tingling, loss of strength or inability to bear weight. In those cases, seek care soon." },
+  estudios_no:{ es:"Aún sin estudios previos: en tu valoración se define si hace falta una radiografía o resonancia, para no gastar de más.",
+                en:"Even without prior studies: your assessment defines whether an X-ray or MRI is needed, so you don't overspend." }
+};
+
+/* ============ ESTADO ============ */
+var LANG = 'es';
+var answers = {};
+var idx = 0;
+
+function T(k){ return (UI[LANG] && UI[LANG][k]) || UI.es[k] || ''; }
+
+function applyLang(lang){
+  LANG = UI[lang] ? lang : 'es';
+  document.documentElement.lang = LANG;
+  try{ localStorage.setItem('ov_lang', LANG); }catch(e){}
+  document.querySelectorAll('[data-k]').forEach(function(el){ var v=T(el.getAttribute('data-k')); if(v) el.textContent=v; });
+  var pn=document.getElementById('nombre'), pt=document.getElementById('telefono');
+  if(pn) pn.placeholder=T('ph_name'); if(pt) pt.placeholder=T('ph_phone');
+  document.querySelectorAll('.lang button').forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-lang')===LANG); });
+  if(!document.getElementById('screen-quiz').classList.contains('hidden')) renderQuestion();
+}
+
+function show(id){
+  ['screen-intro','screen-quiz','screen-lead','screen-result'].forEach(function(s){
+    document.getElementById(s).classList.toggle('hidden', s!==id);
+  });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function renderQuestion(){
+  var q = QUESTIONS[idx];
+  document.getElementById('ptot').textContent = QUESTIONS.length;
+  document.getElementById('pnow').textContent = idx+1;
+  document.getElementById('bar').style.width = ((idx)/QUESTIONS.length*100) + '%';
+  document.getElementById('q-text').textContent = q[LANG];
+  var opts = document.getElementById('opts'); opts.innerHTML='';
+  q.opts.forEach(function(o){
+    var b=document.createElement('button');
+    b.className='opt'+(answers[q.key]===o.v?' sel':'');
+    b.innerHTML='<span class="tick"></span><span>'+o[LANG]+'</span>';
+    b.addEventListener('click', function(){
+      answers[q.key]=o.v;
+      opts.querySelectorAll('.opt').forEach(function(x){x.classList.remove('sel');});
+      b.classList.add('sel');
+      document.getElementById('next-btn').disabled=false;
+    });
+    opts.appendChild(b);
+  });
+  document.getElementById('next-btn').disabled = !answers[q.key];
+  document.getElementById('back-btn').disabled = (idx===0);
+  document.getElementById('next-btn').textContent = (idx===QUESTIONS.length-1) ? (LANG==='en'?'Finish':'Finalizar') : T('nav_next');
+}
+
+function buildTips(){
+  var t=[], z=answers.zona, o=answers.origen;
+  if(TIPS.zona[z]) t.push(TIPS.zona[z][LANG]);
+  if(TIPS.origen[o]) t.push(TIPS.origen[o][LANG]);
+  if(answers.limitacion==='alta' || answers.limitacion==='severa') t.push(TIPS.alarma[LANG]);
+  if(answers.estudios==='no') t.push(TIPS.estudios_no[LANG]);
+  if(t.length<3) t.push(TIPS.alarma[LANG]);
+  return t.filter(function(v,i,a){return a.indexOf(v)===i;}).slice(0,4);
+}
+
+function zonaLabel(){
+  var q=QUESTIONS[0], v=answers.zona;
+  for(var i=0;i<q.opts.length;i++){ if(q.opts[i].v===v) return q.opts[i][LANG]; }
+  return '';
+}
+
+function renderResult(nombre){
+  document.getElementById('r-badge').textContent = zonaLabel();
+  document.getElementById('r-intro').textContent = (nombre? (nombre+', ') : '') + T('r_intro');
+  var ul=document.getElementById('r-tips'); ul.innerHTML='';
+  buildTips().forEach(function(tip,i){
+    var li=document.createElement('li');
+    li.innerHTML='<span class="dot">'+(i+1)+'</span><span>'+tip+'</span>';
+    ul.appendChild(li);
+  });
+  show('screen-result');
+}
+
+function sendLead(payload){
+  try{
+    if(FORM_ENDPOINT){
+      fetch(FORM_ENDPOINT, { method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(payload) })
+        .catch(function(e){ console.error(e); });
+    }
+  }catch(e){ console.error(e); }
+}
+
+function init(fn){ try{ fn(); }catch(e){ console.error(e); } }
+
+init(function(){
+  var saved='es'; try{ saved=localStorage.getItem('ov_lang')||'es'; }catch(e){}
+  applyLang(saved);
+  document.querySelectorAll('.lang button').forEach(function(b){
+    b.addEventListener('click', function(){ applyLang(b.getAttribute('data-lang')); });
+  });
+
+  document.getElementById('start-btn').addEventListener('click', function(){ idx=0; show('screen-quiz'); renderQuestion(); });
+  document.getElementById('back-btn').addEventListener('click', function(){ if(idx>0){ idx--; renderQuestion(); } });
+  document.getElementById('next-btn').addEventListener('click', function(){
+    if(!answers[QUESTIONS[idx].key]) return;
+    if(idx<QUESTIONS.length-1){ idx++; renderQuestion(); }
+    else { document.getElementById('bar').style.width='100%'; show('screen-lead'); }
+  });
+
+  document.getElementById('submit-btn').addEventListener('click', function(){
+    var err=document.getElementById('lead-err');
+    var nombre=document.getElementById('nombre').value.trim().replace(/\s+/g,' ');
+    var telefono=document.getElementById('telefono').value.trim();
+    var nameOk=/^[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'’.\-]{2,}(\s+[A-Za-zÁÉÍÓÚÜÑáéíóúüñ'’.\-]{2,})+$/.test(nombre);
+    if(!nameOk){ err.textContent=T('err_name'); return; }
+    var d=telefono.replace(/\D/g,'');
+    if(d.indexOf('58')===0 && d.length===12) d=d.slice(2);
+    else if(d.charAt(0)==='0' && d.length===11) d=d.slice(1);
+    if(!/^4(12|14|16|24|26)\d{7}$/.test(d)){ err.textContent=T('err_phone'); return; }
+    var telefonoNorm='0'+d;
+    err.textContent='';
+    var btn=this; btn.disabled=true; btn.textContent=T('sending');
+    var payload={ hoja:"orthovital", nombre:nombre, telefono:telefonoNorm, idioma:LANG };
+    QUESTIONS.forEach(function(q){ payload[q.key]=answers[q.key]||''; });
+    sendLead(payload);
+    setTimeout(function(){ renderResult(nombre); }, 600);
+  });
+
+  var y=document.getElementById('year'); if(y) y.textContent=new Date().getFullYear();
+});
+</script>
+</body>
+</html>
